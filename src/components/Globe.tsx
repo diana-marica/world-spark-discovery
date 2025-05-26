@@ -51,8 +51,11 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
     }
   }, []);
 
-  const handleCountryClick = useCallback((country: CountryData) => {
+  const handleCountryClick = useCallback((country: CountryData, event: MouseEvent) => {
     console.log('Clicked country:', country.name);
+    
+    // Stop event propagation to prevent globe rotation
+    event.stopPropagation();
     
     // Animate to country
     if (globeEl.current) {
@@ -73,7 +76,7 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
 
   return (
     <div className="relative">
-      <div className="w-full max-w-lg mx-auto aspect-square rounded-full shadow-2xl overflow-hidden">
+      <div className="w-full max-w-lg mx-auto aspect-square">
         <ReactGlobe
           ref={globeEl}
           globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
@@ -85,11 +88,16 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
           pointLat="lat"
           pointLng="lng"
           pointColor="color"
-          pointAltitude={0.01}
-          pointRadius={0.8}
+          pointAltitude={0.02}
+          pointRadius={1.2}
           
           // Point interactions
           onPointClick={handleCountryClick}
+          onPointHover={(country: CountryData | null) => {
+            if (globeEl.current) {
+              globeEl.current.style.cursor = country ? 'pointer' : 'grab';
+            }
+          }}
           pointLabel={(d: any) => `
             <div style="
               color: white; 
@@ -98,6 +106,7 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
               border-radius: 6px;
               font-family: Arial, sans-serif;
               font-size: 14px;
+              pointer-events: none;
             ">
               🌍 ${d.name}
               <br/>
