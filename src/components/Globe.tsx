@@ -31,7 +31,7 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
     container.appendChild(renderer.domElement);
 
     // Enhanced Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
     scene.add(ambientLight);
     
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
@@ -41,57 +41,108 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
     directionalLight.shadow.mapSize.height = 2048;
     scene.add(directionalLight);
 
-    // Point light for rim lighting
     const pointLight = new THREE.PointLight(0x4a90e2, 0.8, 100);
     pointLight.position.set(-5, 0, 5);
     scene.add(pointLight);
 
-    // Create Earth with texture
-    const earthGeometry = new THREE.SphereGeometry(2, 64, 64);
+    // Create realistic Earth texture
+    const earthGeometry = new THREE.SphereGeometry(2, 128, 128);
     
-    // Create a simple procedural Earth-like texture
     const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 512;
+    canvas.width = 2048;
+    canvas.height = 1024;
     const ctx = canvas.getContext('2d')!;
     
-    // Create gradient for ocean
-    const gradient = ctx.createLinearGradient(0, 0, 0, 512);
-    gradient.addColorStop(0, '#87CEEB');
-    gradient.addColorStop(1, '#4682B4');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 1024, 512);
+    // Ocean background with depth
+    const oceanGradient = ctx.createRadialGradient(1024, 512, 0, 1024, 512, 1024);
+    oceanGradient.addColorStop(0, '#1e3a8a');
+    oceanGradient.addColorStop(0.5, '#1e40af');
+    oceanGradient.addColorStop(1, '#1e1b4b');
+    ctx.fillStyle = oceanGradient;
+    ctx.fillRect(0, 0, 2048, 1024);
+
+    // More accurate continent shapes
+    ctx.fillStyle = '#22c55e';
     
-    // Add simple land masses (continents approximation)
-    ctx.fillStyle = '#228B22';
     // North America
-    ctx.fillRect(150, 180, 200, 150);
+    ctx.beginPath();
+    ctx.moveTo(150, 200);
+    ctx.quadraticCurveTo(200, 180, 280, 200);
+    ctx.quadraticCurveTo(350, 220, 380, 280);
+    ctx.quadraticCurveTo(300, 320, 250, 300);
+    ctx.quadraticCurveTo(180, 290, 150, 250);
+    ctx.closePath();
+    ctx.fill();
+
+    // Greenland
+    ctx.fillRect(280, 120, 60, 40);
+
     // South America
-    ctx.fillRect(200, 330, 120, 180);
-    // Europe/Asia
-    ctx.fillRect(450, 150, 400, 200);
+    ctx.beginPath();
+    ctx.moveTo(280, 350);
+    ctx.quadraticCurveTo(320, 340, 340, 380);
+    ctx.quadraticCurveTo(350, 450, 330, 520);
+    ctx.quadraticCurveTo(310, 480, 290, 460);
+    ctx.quadraticCurveTo(270, 420, 270, 380);
+    ctx.closePath();
+    ctx.fill();
+
+    // Europe
+    ctx.fillRect(480, 180, 120, 80);
+    ctx.fillRect(520, 160, 60, 40);
+
+    // Asia
+    ctx.fillRect(600, 160, 300, 140);
+    ctx.fillRect(750, 200, 200, 100);
+    ctx.fillRect(900, 180, 150, 120);
+
     // Africa
-    ctx.fillRect(480, 250, 150, 200);
+    ctx.beginPath();
+    ctx.moveTo(480, 280);
+    ctx.quadraticCurveTo(520, 270, 560, 290);
+    ctx.quadraticCurveTo(580, 350, 570, 420);
+    ctx.quadraticCurveTo(540, 480, 500, 470);
+    ctx.quadraticCurveTo(470, 430, 460, 380);
+    ctx.quadraticCurveTo(470, 320, 480, 280);
+    ctx.closePath();
+    ctx.fill();
+
     // Australia
-    ctx.fillRect(750, 380, 100, 80);
+    ctx.fillRect(850, 450, 120, 60);
+
+    // Antarctica (bottom)
+    ctx.fillRect(0, 480, 2048, 80);
+
+    // Add mountain ranges and islands
+    ctx.fillStyle = '#16a34a';
     
-    // Add some texture variation
-    ctx.fillStyle = '#32CD32';
-    for (let i = 0; i < 50; i++) {
-      const x = Math.random() * 1024;
-      const y = Math.random() * 512;
-      const size = Math.random() * 30 + 10;
-      ctx.fillRect(x, y, size, size);
+    // Andes mountains
+    ctx.fillRect(270, 350, 15, 170);
+    
+    // Himalayas
+    ctx.fillRect(700, 220, 100, 20);
+    
+    // Various islands
+    for (let i = 0; i < 30; i++) {
+      const x = Math.random() * 2048;
+      const y = Math.random() * 1024;
+      const size = Math.random() * 15 + 5;
+      ctx.fillRect(x, y, size, size/2);
     }
-    
+
+    // Add ice caps
+    ctx.fillStyle = '#f0f9ff';
+    ctx.fillRect(0, 0, 2048, 40); // North pole
+    ctx.fillRect(0, 480, 2048, 40); // Antarctica detail
+
     const earthTexture = new THREE.CanvasTexture(canvas);
     earthTexture.wrapS = THREE.RepeatWrapping;
     earthTexture.wrapT = THREE.RepeatWrapping;
     
     const earthMaterial = new THREE.MeshPhongMaterial({
       map: earthTexture,
-      shininess: 100,
-      specular: 0x111111,
+      shininess: 30,
+      specular: 0x222222,
     });
     
     const earth = new THREE.Mesh(earthGeometry, earthMaterial);
@@ -99,19 +150,18 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
     earth.receiveShadow = true;
     scene.add(earth);
 
-    // Enhanced atmosphere with multiple layers
-    const atmosphereGeometry = new THREE.SphereGeometry(2.1, 64, 64);
+    // Atmosphere layers
+    const atmosphereGeometry = new THREE.SphereGeometry(2.08, 64, 64);
     const atmosphereMaterial = new THREE.MeshBasicMaterial({
       color: 0x87CEEB,
       transparent: true,
-      opacity: 0.15,
+      opacity: 0.2,
       side: THREE.BackSide,
     });
     const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
     scene.add(atmosphere);
 
-    // Outer glow
-    const glowGeometry = new THREE.SphereGeometry(2.2, 32, 32);
+    const glowGeometry = new THREE.SphereGeometry(2.15, 32, 32);
     const glowMaterial = new THREE.MeshBasicMaterial({
       color: 0x4a90e2,
       transparent: true,
@@ -121,7 +171,7 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
     const glow = new THREE.Mesh(glowGeometry, glowMaterial);
     scene.add(glow);
 
-    // Enhanced country markers with better positioning
+    // Enhanced country markers
     const countries = [
       { name: 'United States', lat: 39.8283, lon: -98.5795 },
       { name: 'Brazil', lat: -14.2350, lon: -51.9253 },
@@ -137,7 +187,6 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
       { name: 'Canada', lat: 56.1304, lon: -106.3468 },
     ];
 
-    // Convert lat/lon to 3D coordinates
     const latLonToVector3 = (lat: number, lon: number, radius: number) => {
       const phi = (90 - lat) * (Math.PI / 180);
       const theta = (lon + 180) * (Math.PI / 180);
@@ -147,53 +196,72 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
       return new THREE.Vector3(x, y, z);
     };
 
+    // Create marker group that's separate from earth for better selection
     const markerGroup = new THREE.Group();
     const markers: THREE.Mesh[] = [];
+    const markerGlows: THREE.Mesh[] = [];
     
     countries.forEach((country, index) => {
-      const position = latLonToVector3(country.lat, country.lon, 2.05);
+      const position = latLonToVector3(country.lat, country.lon, 2.1);
       
-      // Create marker with glow effect
-      const markerGeometry = new THREE.SphereGeometry(0.04, 16, 16);
+      // Main marker
+      const markerGeometry = new THREE.SphereGeometry(0.05, 16, 16);
       const markerMaterial = new THREE.MeshBasicMaterial({ 
-        color: 0xff4444,
+        color: 0xff3333,
         transparent: true,
-        opacity: 0.9,
+        opacity: 1,
       });
       const marker = new THREE.Mesh(markerGeometry, markerMaterial);
       marker.position.copy(position);
-      marker.userData = { name: country.name, index };
+      marker.userData = { name: country.name, index, type: 'marker' };
       
-      // Add pulsing glow
+      // Glow effect
       const glowGeometry = new THREE.SphereGeometry(0.08, 16, 16);
       const glowMaterial = new THREE.MeshBasicMaterial({
         color: 0xff6666,
         transparent: true,
-        opacity: 0.3,
+        opacity: 0.4,
       });
       const markerGlow = new THREE.Mesh(glowGeometry, glowMaterial);
       markerGlow.position.copy(position);
+      markerGlow.userData = { name: country.name, index, type: 'glow' };
       
-      markerGroup.add(marker);
-      markerGroup.add(markerGlow);
+      // Ring effect
+      const ringGeometry = new THREE.RingGeometry(0.06, 0.1, 16);
+      const ringMaterial = new THREE.MeshBasicMaterial({
+        color: 0xff4444,
+        transparent: true,
+        opacity: 0.3,
+        side: THREE.DoubleSide,
+      });
+      const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+      ring.position.copy(position);
+      ring.lookAt(0, 0, 0);
+      ring.userData = { name: country.name, index, type: 'ring' };
+      
+      scene.add(marker);
+      scene.add(markerGlow);
+      scene.add(ring);
+      
       markers.push(marker);
+      markerGlows.push(markerGlow);
     });
-    
-    earth.add(markerGroup);
+
     camera.position.z = 5;
 
-    // Enhanced mouse interaction
+    // Enhanced interaction
     let isDragging = false;
     let previousMouse = { x: 0, y: 0 };
     let dragStartTime = 0;
+    let totalDragDistance = 0;
     
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
-    // Mouse controls with momentum
     const onMouseDown = (event: MouseEvent) => {
       isDragging = true;
       dragStartTime = Date.now();
+      totalDragDistance = 0;
       previousMouse = { x: event.clientX, y: event.clientY };
     };
 
@@ -202,10 +270,11 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
         const deltaX = event.clientX - previousMouse.x;
         const deltaY = event.clientY - previousMouse.y;
         
+        totalDragDistance += Math.abs(deltaX) + Math.abs(deltaY);
+        
         earth.rotation.y += deltaX * 0.008;
         earth.rotation.x += deltaY * 0.008;
         
-        // Limit vertical rotation
         earth.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, earth.rotation.x));
         
         previousMouse = { x: event.clientX, y: event.clientY };
@@ -218,31 +287,43 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
 
     const onMouseClick = (event: MouseEvent) => {
       const dragDuration = Date.now() - dragStartTime;
-      if (isDragging || dragDuration > 200) return; // Ignore if was dragging
+      
+      // Only register click if minimal dragging occurred
+      if (totalDragDistance > 10 || dragDuration > 300) return;
       
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
       
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(markers);
+      
+      // Check all scene objects that could be markers
+      const allObjects = scene.children.filter(child => 
+        child.userData.type === 'marker' || 
+        child.userData.type === 'glow' || 
+        child.userData.type === 'ring'
+      );
+      
+      const intersects = raycaster.intersectObjects(allObjects);
       
       if (intersects.length > 0) {
         const selectedObject = intersects[0].object;
         if (selectedObject.userData.name) {
-          // Add click feedback
+          console.log('Clicked country:', selectedObject.userData.name);
+          
+          // Visual feedback
           const originalScale = selectedObject.scale.clone();
           selectedObject.scale.multiplyScalar(1.5);
           setTimeout(() => {
             selectedObject.scale.copy(originalScale);
-          }, 200);
+          }, 300);
           
           onCountrySelect(selectedObject.userData.name);
         }
       }
     };
 
-    // Touch support for mobile
+    // Touch support
     const onTouchStart = (event: TouchEvent) => {
       if (event.touches.length === 1) {
         const touch = event.touches[0];
@@ -271,11 +352,9 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
     renderer.domElement.addEventListener('touchmove', onTouchMove);
     renderer.domElement.addEventListener('touchend', onTouchEnd);
 
-    // Auto-rotation and marker animation
-    let autoRotateSpeed = 0.005;
+    let autoRotateSpeed = 0.003;
     let time = 0;
     
-    // Animation loop
     const animate = () => {
       requestAnimationFrame(animate);
       time += 0.01;
@@ -284,17 +363,21 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
         earth.rotation.y += autoRotateSpeed;
       }
       
-      // Animate marker glow
-      markerGroup.children.forEach((child, index) => {
-        if (index % 2 === 1) { // Only glow elements
-          const material = (child as THREE.Mesh).material as THREE.MeshBasicMaterial;
-          material.opacity = 0.2 + 0.3 * Math.sin(time * 2 + index);
-        }
+      // Animate markers
+      markers.forEach((marker, index) => {
+        // Pulsing effect
+        const scale = 1 + 0.2 * Math.sin(time * 3 + index);
+        marker.scale.setScalar(scale);
       });
       
-      // Animate atmosphere
-      atmosphere.rotation.y += 0.002;
-      glow.rotation.y -= 0.001;
+      markerGlows.forEach((glow, index) => {
+        const material = glow.material as THREE.MeshBasicMaterial;
+        material.opacity = 0.3 + 0.3 * Math.sin(time * 2 + index);
+      });
+      
+      // Atmosphere animation
+      atmosphere.rotation.y += 0.001;
+      glow.rotation.y -= 0.0005;
       
       renderer.render(scene, camera);
     };
@@ -302,7 +385,6 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
     setIsLoading(false);
     animate();
 
-    // Handle window resize
     const handleResize = () => {
       const newSize = Math.min(container.clientWidth, 500);
       camera.aspect = 1;
@@ -334,18 +416,18 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
     <div className="relative">
       <div 
         ref={mountRef} 
-        className="w-full max-w-lg mx-auto aspect-square rounded-full shadow-2xl overflow-hidden"
+        className="w-full max-w-lg mx-auto aspect-square rounded-full shadow-2xl overflow-hidden cursor-grab active:cursor-grabbing"
         style={{
           background: 'radial-gradient(circle, #1a1a2e 0%, #16213e 50%, #0f0f23 100%)'
         }}
       />
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-white text-lg">Loading Earth...</div>
+          <div className="text-white text-lg animate-pulse">Loading Earth...</div>
         </div>
       )}
       <div className="text-center mt-4 text-gray-600">
-        <p className="text-sm">🌍 Click and drag to rotate • Click red markers to explore countries</p>
+        <p className="text-sm">🌍 Click and drag to rotate • Click red dots to explore countries</p>
         <p className="text-xs mt-1 text-gray-500">Touch and swipe on mobile devices</p>
       </div>
     </div>
