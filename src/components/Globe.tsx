@@ -1,6 +1,6 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import Globe from 'react-globe.gl';
+import ReactGlobe from 'react-globe.gl';
 
 interface GlobeProps {
   onCountrySelect: (country: string) => void;
@@ -55,11 +55,13 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
     console.log('Clicked country:', country.name);
     
     // Animate to country
-    globeEl.current.pointOfView({
-      lat: country.lat,
-      lng: country.lng,
-      altitude: 1.5
-    }, 1000);
+    if (globeEl.current) {
+      globeEl.current.pointOfView({
+        lat: country.lat,
+        lng: country.lng,
+        altitude: 1.5
+      }, 1000);
+    }
     
     // Call the parent callback
     onCountrySelect(country.name);
@@ -72,7 +74,7 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
   return (
     <div className="relative">
       <div className="w-full max-w-lg mx-auto aspect-square rounded-full shadow-2xl overflow-hidden">
-        <Globe
+        <ReactGlobe
           ref={globeEl}
           globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
           bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
