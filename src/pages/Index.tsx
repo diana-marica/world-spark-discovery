@@ -27,15 +27,15 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Left Column - Random Facts */}
-          <div className="lg:col-span-1">
+          <div className="w-full lg:w-1/3">
             <RandomFactCard />
           </div>
 
-          {/* Center Column - Globe and Search */}
-          <div className="lg:col-span-2">
-            <div className="mb-6">
+          {/* Right Column - Globe and Search */}
+          <div className="w-full lg:w-2/3 flex flex-col items-center">
+            <div className="w-full max-w-md mb-6">
               <SearchBar 
                 value={searchQuery}
                 onChange={setSearchQuery}
@@ -43,7 +43,7 @@ const Index = () => {
               />
             </div>
             
-            <div className="relative">
+            <div className="flex justify-center">
               <Globe onCountrySelect={setSelectedCountry} />
             </div>
           </div>

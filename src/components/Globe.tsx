@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import ReactGlobe from 'react-globe.gl';
 
@@ -112,8 +111,8 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
   }, []);
 
   return (
-    <div className="relative">
-      <div className="w-full max-w-lg mx-auto aspect-square">
+    <div className="flex flex-col items-center">
+      <div className="w-full max-w-4xl mx-auto">
         <ReactGlobe
           ref={globeEl}
           globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
@@ -126,12 +125,11 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
           pointLng="lng"
           pointColor="color"
           pointAltitude={0.02}
-          pointRadius={1.2}
+          pointRadius={2}
           
           // Point interactions
           onPointClick={handleCountryClick}
           onPointHover={(country: CountryData | null) => {
-            // Access the canvas element through the renderer
             const canvas = globeEl.current?.renderer()?.domElement;
             if (canvas) {
               canvas.style.cursor = country ? 'pointer' : 'grab';
@@ -164,9 +162,9 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
           // Globe ready callback
           onGlobeReady={handleGlobeReady}
           
-          // Styling
-          width={500}
-          height={500}
+          // Styling - Made larger
+          width={700}
+          height={700}
         />
       </div>
       
