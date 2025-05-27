@@ -19,20 +19,60 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [countries, setCountries] = useState<CountryData[]>([]);
 
-  // Country data with proper coordinates
+  // Expanded country data with proper coordinates from all continents
   const countryData: CountryData[] = [
+    // North America
     { name: 'United States', lat: 39.8283, lng: -98.5795, color: '#ff3333', size: 1 },
+    { name: 'Canada', lat: 56.1304, lng: -106.3468, color: '#ff3333', size: 1 },
+    { name: 'Mexico', lat: 23.6345, lng: -102.5528, color: '#ff3333', size: 1 },
+    
+    // South America
     { name: 'Brazil', lat: -14.2350, lng: -51.9253, color: '#ff3333', size: 1 },
-    { name: 'China', lat: 35.8617, lng: 104.1954, color: '#ff3333', size: 1 },
-    { name: 'India', lat: 20.5937, lng: 78.9629, color: '#ff3333', size: 1 },
-    { name: 'Egypt', lat: 26.0975, lng: 31.2357, color: '#ff3333', size: 1 },
-    { name: 'Japan', lat: 36.2048, lng: 138.2529, color: '#ff3333', size: 1 },
-    { name: 'Kenya', lat: -0.0236, lng: 37.9062, color: '#ff3333', size: 1 },
-    { name: 'Australia', lat: -25.2744, lng: 133.7751, color: '#ff3333', size: 1 },
+    { name: 'Argentina', lat: -38.4161, lng: -63.6167, color: '#ff3333', size: 1 },
+    { name: 'Peru', lat: -9.1900, lng: -75.0152, color: '#ff3333', size: 1 },
+    { name: 'Colombia', lat: 4.5709, lng: -74.2973, color: '#ff3333', size: 1 },
+    { name: 'Chile', lat: -35.6751, lng: -71.5430, color: '#ff3333', size: 1 },
+    
+    // Europe
     { name: 'France', lat: 46.2276, lng: 2.2137, color: '#ff3333', size: 1 },
     { name: 'Germany', lat: 51.1657, lng: 10.4515, color: '#ff3333', size: 1 },
+    { name: 'Italy', lat: 41.8719, lng: 12.5674, color: '#ff3333', size: 1 },
+    { name: 'Spain', lat: 40.4637, lng: -3.7492, color: '#ff3333', size: 1 },
+    { name: 'United Kingdom', lat: 55.3781, lng: -3.4360, color: '#ff3333', size: 1 },
+    { name: 'Greece', lat: 39.0742, lng: 21.8243, color: '#ff3333', size: 1 },
+    { name: 'Norway', lat: 60.4720, lng: 8.4689, color: '#ff3333', size: 1 },
+    { name: 'Sweden', lat: 60.1282, lng: 18.6435, color: '#ff3333', size: 1 },
+    { name: 'Netherlands', lat: 52.1326, lng: 5.2913, color: '#ff3333', size: 1 },
+    
+    // Asia
+    { name: 'China', lat: 35.8617, lng: 104.1954, color: '#ff3333', size: 1 },
+    { name: 'India', lat: 20.5937, lng: 78.9629, color: '#ff3333', size: 1 },
+    { name: 'Japan', lat: 36.2048, lng: 138.2529, color: '#ff3333', size: 1 },
+    { name: 'South Korea', lat: 35.9078, lng: 127.7669, color: '#ff3333', size: 1 },
+    { name: 'Thailand', lat: 15.8700, lng: 100.9925, color: '#ff3333', size: 1 },
+    { name: 'Vietnam', lat: 14.0583, lng: 108.2772, color: '#ff3333', size: 1 },
+    { name: 'Indonesia', lat: -0.7893, lng: 113.9213, color: '#ff3333', size: 1 },
+    { name: 'Turkey', lat: 38.9637, lng: 35.2433, color: '#ff3333', size: 1 },
     { name: 'Russia', lat: 61.5240, lng: 105.3188, color: '#ff3333', size: 1 },
-    { name: 'Canada', lat: 56.1304, lng: -106.3468, color: '#ff3333', size: 1 },
+    { name: 'Philippines', lat: 12.8797, lng: 121.7740, color: '#ff3333', size: 1 },
+    
+    // Africa
+    { name: 'Egypt', lat: 26.0975, lng: 31.2357, color: '#ff3333', size: 1 },
+    { name: 'Kenya', lat: -0.0236, lng: 37.9062, color: '#ff3333', size: 1 },
+    { name: 'South Africa', lat: -30.5595, lng: 22.9375, color: '#ff3333', size: 1 },
+    { name: 'Morocco', lat: 31.7917, lng: -7.0926, color: '#ff3333', size: 1 },
+    { name: 'Nigeria', lat: 9.0820, lng: 8.6753, color: '#ff3333', size: 1 },
+    { name: 'Ghana', lat: 7.9465, lng: -1.0232, color: '#ff3333', size: 1 },
+    { name: 'Ethiopia', lat: 9.1450, lng: 40.4897, color: '#ff3333', size: 1 },
+    
+    // Oceania
+    { name: 'Australia', lat: -25.2744, lng: 133.7751, color: '#ff3333', size: 1 },
+    { name: 'New Zealand', lat: -40.9006, lng: 174.8860, color: '#ff3333', size: 1 },
+    
+    // Middle East
+    { name: 'Saudi Arabia', lat: 23.8859, lng: 45.0792, color: '#ff3333', size: 1 },
+    { name: 'Israel', lat: 31.0461, lng: 34.8516, color: '#ff3333', size: 1 },
+    { name: 'Iran', lat: 32.4279, lng: 53.6880, color: '#ff3333', size: 1 }
   ];
 
   useEffect(() => {
@@ -140,7 +180,7 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
       
       <div className="text-center mt-4 text-gray-600">
         <p className="text-sm">🌍 Click and drag to rotate • Click red dots to explore countries</p>
-        <p className="text-xs mt-1 text-gray-500">Hover over markers for country names</p>
+        <p className="text-xs mt-1 text-gray-500">Hover over markers for country names • {countries.length} countries to discover!</p>
       </div>
     </div>
   );
