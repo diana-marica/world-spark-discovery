@@ -51,11 +51,8 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
     }
   }, []);
 
-  const handleCountryClick = useCallback((country: CountryData, event: MouseEvent) => {
+  const handleCountryClick = useCallback((country: CountryData) => {
     console.log('Clicked country:', country.name);
-    
-    // Stop event propagation to prevent globe rotation
-    event.stopPropagation();
     
     // Animate to country
     if (globeEl.current) {
@@ -94,8 +91,10 @@ export const Globe = ({ onCountrySelect }: GlobeProps) => {
           // Point interactions
           onPointClick={handleCountryClick}
           onPointHover={(country: CountryData | null) => {
-            if (globeEl.current) {
-              globeEl.current.style.cursor = country ? 'pointer' : 'grab';
+            // Access the canvas element through the renderer
+            const canvas = globeEl.current?.renderer()?.domElement;
+            if (canvas) {
+              canvas.style.cursor = country ? 'pointer' : 'grab';
             }
           }}
           pointLabel={(d: any) => `
